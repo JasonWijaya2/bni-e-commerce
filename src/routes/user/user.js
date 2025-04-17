@@ -32,7 +32,7 @@ const registerUser = async (req, res) => {
     user.push(newUser);
 
     // Write the updated user array back to user.json
-    fs.writeFileSync(user, JSON.stringify(user, null, 2));
+    fs.writeFileSync("./db/user.json", JSON.stringify(user, null, 2));
 
     return res.status(201).json({
       status: "success",

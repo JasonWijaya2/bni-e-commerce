@@ -3,15 +3,5 @@
     "id": 1,
     "username": "admin",
     "password": "admin"
-  },
-  {
-    "id": 2,
-    "username": "jason",
-    "password": "asepkadal123"
-  },
-  {
-    "id": 3,
-    "username": "muafi",
-    "password": "asepkadal123"
   }
 ]

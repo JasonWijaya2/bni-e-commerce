@@ -1,21 +1,19 @@
-const fs = require("fs");
+const { User } = require("../../../models"); // Import the User model
 
-// Code Here!!!
-const user = require("../../../db/user.json");
-
-// routing for user resgister
+// Routing for user registration
 const registerUser = async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    if (!username && !password) {
+    if (!username || !password) {
       return res.status(403).json({
         status: "error",
         message: "Fill the required field!",
       });
     }
 
-    const foundUser = user.find((u) => u.username === username);
+    // Check if the user already exists in the database
+    const foundUser = await User.findOne({ where: { username } });
 
     if (foundUser) {
       return res.status(409).json({
@@ -24,23 +22,16 @@ const registerUser = async (req, res) => {
       });
     }
 
-    const newUser = {
-      id: user.length + 1,
-      username,
-      password,
-    };
-    user.push(newUser);
-
-    // Write the updated user array back to user.json
-    fs.writeFileSync("./db/user.json", JSON.stringify(user, null, 2));
+    // Create a new user in the database
+    const newUser = await User.create({ username, password });
 
     return res.status(201).json({
       status: "success",
       message: "User registered successfully!",
-      data: newUser,
+      data: { id: newUser.id, username: newUser.username },
     });
   } catch (error) {
-    console.error("Error writing to user.json:", error);
+    console.error("Error registering user:", error);
     return res.status(500).json({
       status: "error",
       message: "Internal Server Error",
@@ -48,18 +39,20 @@ const registerUser = async (req, res) => {
   }
 };
 
+// Routing for user login
 const loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    if (!username && !password) {
+    if (!username || !password) {
       return res.status(403).json({
         status: "error",
         message: "Fill the required field!",
       });
     }
 
-    const foundUser = user.find((u) => u.username === username);
+    // Find the user in the database
+    const foundUser = await User.findOne({ where: { username } });
 
     if (!foundUser) {
       return res.status(404).json({
@@ -81,6 +74,7 @@ const loginUser = async (req, res) => {
       data: { id: foundUser.id, username: foundUser.username },
     });
   } catch (error) {
+    console.error("Error logging in user:", error);
     return res.status(500).json({
       status: "error",
       message: "Internal Server Error",
